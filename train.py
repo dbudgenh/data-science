@@ -40,55 +40,70 @@ USE_DATA_AUGMENTATION = True
 MODEL_NAME ='efficientnetB2'
 
 
-def getModel(img_size):
-    visible = Input(shape=(img_size, img_size, 1), dtype=tf.float32)
-
-    conv = Conv2D(32, (5, 5))(visible)
-    conv_act = Activation('relu')(conv)
-    conv_act_batch = BatchNormalization()(conv_act)
-    conv_maxpool = MaxPooling2D()(conv_act_batch)
-    conv_dropout = Dropout(0.1)(conv_maxpool)
-
-    conv = Conv2D(64, (3, 3))(conv_dropout)
-    conv_act = Activation('relu')(conv)
-    conv_act_batch = BatchNormalization()(conv_act)
-    conv_maxpool = MaxPooling2D()(conv_act_batch)
-    conv_dropout = Dropout(0.2)(conv_maxpool)
-
-    conv = Conv2D(128, (3, 3))(conv_dropout)
-    conv_act = Activation('relu')(conv)
-    conv_act_batch = BatchNormalization()(conv_act)
-    conv_maxpool = MaxPooling2D()(conv_act_batch)
-    conv_dropout = Dropout(0.3)(conv_maxpool)
-
-    conv = Conv2D(256, (3, 3))(conv_dropout)
-    conv_act = Activation('relu')(conv)
-    conv_act_batch = BatchNormalization()(conv_act)
-    conv_maxpool = MaxPooling2D()(conv_act_batch)
-    conv_dropout = Dropout(0.4)(conv_maxpool)
-
-    conv = Conv2D(512, (3, 3))(conv_dropout)
-    conv_act = Activation('relu')(conv)
-    conv_act_batch = BatchNormalization()(conv_act)
-    conv_maxpool = MaxPooling2D()(conv_act_batch)
-    conv_dropout = Dropout(0.5)(conv_maxpool)
+def getModel(modelName,img_size):
     
-    gap2d = GlobalAveragePooling2D()(conv_dropout)
-    act = Activation('relu')(gap2d)
-    batch = BatchNormalization()(act)
-    dropout = Dropout(0.3)(batch)
-
-    fc1 = Dense(256)(dropout)
-    act = Activation('relu')(fc1)
-    batch = BatchNormalization()(act)
-    dropout = Dropout(0.4)(batch)
-
-    # and a logistic layer
-    predictions = Dense(3, activation='softmax',name='prediction')(dropout)
+    def getNaiveModel():
+        visible = Input(shape=(img_size, img_size, 1), dtype=tf.float32)
+        conv = Conv2D(32, (5, 5))(visible)
+        conv_act = Activation('relu')(conv)
+        conv_act_batch = BatchNormalization()(conv_act)
+        conv_maxpool = MaxPooling2D()(conv_act_batch)
+        conv_dropout = Dropout(0.1)(conv_maxpool)
     
-    # Create model.
-    model = tf.keras.Model(visible, predictions, name=MODEL_NAME)
-    return model, MODEL_NAME
+        conv = Conv2D(64, (3, 3))(conv_dropout)
+        conv_act = Activation('relu')(conv)
+        conv_act_batch = BatchNormalization()(conv_act)
+        conv_maxpool = MaxPooling2D()(conv_act_batch)
+        conv_dropout = Dropout(0.2)(conv_maxpool)
+    
+        conv = Conv2D(128, (3, 3))(conv_dropout)
+        conv_act = Activation('relu')(conv)
+        conv_act_batch = BatchNormalization()(conv_act)
+        conv_maxpool = MaxPooling2D()(conv_act_batch)
+        conv_dropout = Dropout(0.3)(conv_maxpool)
+    
+        conv = Conv2D(256, (3, 3))(conv_dropout)
+        conv_act = Activation('relu')(conv)
+        conv_act_batch = BatchNormalization()(conv_act)
+        conv_maxpool = MaxPooling2D()(conv_act_batch)
+        conv_dropout = Dropout(0.4)(conv_maxpool)
+    
+        conv = Conv2D(512, (3, 3))(conv_dropout)
+        conv_act = Activation('relu')(conv)
+        conv_act_batch = BatchNormalization()(conv_act)
+        conv_maxpool = MaxPooling2D()(conv_act_batch)
+        conv_dropout = Dropout(0.5)(conv_maxpool)
+        
+        gap2d = GlobalAveragePooling2D()(conv_dropout)
+        act = Activation('relu')(gap2d)
+        batch = BatchNormalization()(act)
+        dropout = Dropout(0.3)(batch)
+    
+        fc1 = Dense(256)(dropout)
+        act = Activation('relu')(fc1)
+        batch = BatchNormalization()(act)
+        dropout = Dropout(0.4)(batch)
+    
+        # and a logistic layer
+        predictions = Dense(3, activation='softmax',name='prediction')(dropout)
+        
+        # Create model.
+        model = tf.keras.Model(visible, predictions, name=MODEL_NAME)
+        return model
+    
+    def getEfficientNetModel():
+        model = efn.EfficientNetB2(include_top=True,
+                                         weights=None,
+                                         input_shape=(img_size,img_size,1),
+                                         classes=3)
+        return model
+    
+    if modelName == 'naive':
+        return getNaiveModel(),modelName
+    elif modelName == 'efficientNet':
+        return getEfficientNetModel(),modelName
+    else:
+        raise Exception("Wrong model name! Either use 'naive' or 'efficientNet' as model name!")
 
 def getAugmentorPipeline():
         p = Augmentor.Pipeline()
@@ -151,12 +166,8 @@ def main():
     #Split the data into training- and test set
     X_train,X_test,Y_train,Y_test = splitData(X,Y,validation_ratio=VALIDATION_RATIO)
     #get our Neural network model, for now: either a naive model, or state-of-the-art Efficient-Net model
-    #model,modelName = getModel(IMG_SIZE)
     
-    model,modelName = efn.EfficientNetB2(include_top=True,
-                                         weights=None,
-                                         input_shape=(IMG_SIZE,IMG_SIZE,1),
-                                         classes=3),MODEL_NAME
+    model,modelName = getModel('naive',IMG_SIZE)
     #print out info about the models(layer structures etc)
     model.summary()
     #Adam is an optimization algorithm that can be used instead of the classical stochastic gradient descent procedure to update network weights iterative based in training data
