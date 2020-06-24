@@ -13,12 +13,13 @@ python load_data.py
 This will extract all the images from the first dataset and move the images to the directories 'normal','corona','pneumonia', based on their labels.
 The directories can be found in in the directory 'data'.
 
-1. Run the command:
+2. Run the command:
 ```console
 python load_data2.py
 ```
 This will extract all the images from the second dataset, in the same manner as for the first.
-1. Now run the command:
+
+3. Now run the command:
 ```console
 python train.py
 ```
