@@ -1,0 +1,1 @@
+Contains all the metrics of the model during the training process(training loss, accuracy etc)

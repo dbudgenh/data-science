@@ -1,0 +1,1 @@
+This directory contains all the directories/images for the datasets
