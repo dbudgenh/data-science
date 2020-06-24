@@ -4,22 +4,27 @@ For a detailed project report, click [here](https://docs.google.com/document/d/1
 ## First Steps
 1. Download the [first dataset](https://www.kaggle.com/praveengovi/coronahack-chest-xraydataset) and the [second dataset](https://www.kaggle.com/bachrr/covid-chest-xray)
 1. After the download is complete, extract both datasets in the directory 'data'
+1. Download all the requirements needed by running the following command in your console:
+```console
+pip install -r requirements.txt
+```
+ 
 
 ## Executing the code
-1. In the main directory, run the command:
+1. In the main directory, run the command in your console:
 ```console
 python load_data.py
 ```
 This will extract all the images from the first dataset and move the images to the directories 'normal','corona','pneumonia', based on their labels.
 The directories can be found in in the directory 'data'.
 
-2. Run the command:
+2. Run the command in your console:
 ```console
 python load_data2.py
 ```
 This will extract all the images from the second dataset, in the same manner as for the first.
 
-3. Now run the command:
+3. Now run the command in your console:
 ```console
 python train.py
 ```
