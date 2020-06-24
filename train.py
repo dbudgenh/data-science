@@ -26,6 +26,8 @@ import seaborn as sns
 import pandas as pd
 import matplotlib.pyplot as plt
 
+
+#CONSTANTS
 VALIDATION_RATIO = 0.15
 IMG_SIZE = 260
 BATCH_SIZE = 8
@@ -37,11 +39,10 @@ HISTORY_DIRECTORY = 'history'
 MODEL_DIRECTORY = 'model'
 CONFUSION_MATRIX_DIRECTIORY = 'cmatrix'
 USE_DATA_AUGMENTATION = True
-MODEL_NAME ='efficientnetB2'
 
 
+#Returns the model, either naive or efficientnet
 def getModel(modelName,img_size):
-    
     def getNaiveModel():
         visible = Input(shape=(img_size, img_size, 1), dtype=tf.float32)
         conv = Conv2D(32, (5, 5))(visible)
@@ -88,7 +89,7 @@ def getModel(modelName,img_size):
         predictions = Dense(3, activation='softmax',name='prediction')(dropout)
         
         # Create model.
-        model = tf.keras.Model(visible, predictions, name=MODEL_NAME)
+        model = tf.keras.Model(visible, predictions, name=modelName)
         return model
     
     def getEfficientNetModel():
@@ -105,6 +106,7 @@ def getModel(modelName,img_size):
     else:
         raise Exception("Wrong model name! Either use 'naive' or 'efficientNet' as model name!")
 
+#Data Augmentation operations
 def getAugmentorPipeline():
         p = Augmentor.Pipeline()
         #stack operations...
